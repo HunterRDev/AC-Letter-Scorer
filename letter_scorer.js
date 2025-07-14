@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	const MODAL_TRIGGER_TEXT = document.getElementById('trigger-text');
 	const MODAL_BODY = document.getElementById('modal-overlay');
 	const CLOSE_MODAL = document.getElementById('close-modal');
-
+	let FETCH_RESULT = null;//Assigned at a later point in time when async context is available
+	
 	updateBoxDetails();
 
 	// CHECK A - Punctuation
@@ -64,6 +65,20 @@ document.addEventListener("DOMContentLoaded", function () {
 		return score;
 	}
 
+	async function onlyOneFetch() {
+		//If not initialized initialize
+		if(!FETCH_RESULT){
+			// in-game trigram tables replicated via txt file
+			let response = await fetch('Resources/trigrams-bugged.txt');
+			if (!response.ok) {
+				console.error("Error fetching trigrams file:", response.statusText);
+				return 0;
+			}
+			FETCH_RESULT = await response.text();
+		}
+		return FETCH_RESULT;
+	}
+
 	// CHECK B - Trigrams
 	async function checkB(input) {
 		const PADDED_INPUT = input.padEnd(MAX_CHARS, ' ');
@@ -71,14 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		let score = 0;
 		let allTrigrams = await getAllTrigrams(PADDED_INPUT);
 
-		// in-game trigram tables replicated via txt file
-		const response = await fetch('Resources/trigrams-bugged.txt');
-		if (!response.ok) {
-			console.error("Error fetching trigrams file:", response.statusText);
-			return 0;
-		}
-
-		let trigramTables = await response.text();
+		let trigramTables = await onlyOneFetch();
 		if (!trigramTables) {
 			console.error("Trigrams file is empty or invalid.");
 			return 0;
