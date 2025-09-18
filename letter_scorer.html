@@ -1,292 +1,304 @@
+---
+layout: default
+title: Animal Crossing Letter Scorer
+permalink: /ac-letter-scorer/
+---
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script type="module" src="../projects/letter_scorer/letter_scorer.js" defer></script>
-	<link rel="stylesheet" href="../projects/letter_scorer/letter_scorer.css">
-	<title>Animal Crossing Letter Scorer</title>
-	<style>
-	</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="letter_scorer.js" defer></script>
+  <link rel="stylesheet" href="letter_scorer.css">
+  <title>Animal Crossing Letter Scorer</title>
+  <style>
+  </style>
 </head>
 
 <body>
-	<h1>Animal Crossing (GCN) Letter Scorer Tool</h1>
+  <h1>Animal Crossing (GCN) Letter Scorer Tool</h1>
+  <div id="responseSettings">
+    <table id="header-table">
+      <tr>
+        <td class="fit-one-line"><span class="fit" id="scoreHeader">LETTER TEXT</span></td>
+        <td><b>Villager reply</b></td>
+        <td id="friendship-header"><b>Friendship</b></td>
+      </tr>
+      <tr>
+        <td><span id="letterScore" class="neutral">0 pts</span></td>
+        <td><span id="replyMessage" class="neutral">Villager will not send a reply.</span></td>
+        <td><span id="friendshipMessage" class="neutral"></span></td>
+      </tr>
+    </table>
+  </div>
+  <div class="quest-container" style="position: relative;">
+  </div>
+  <div class="stationery">
+    <textarea id="letter-text" maxlength="192" rows="5" ; class="write" ;
+      placeholder="Type your letter body here..."></textarea>
+    <input type="checkbox" id="present-attached" class="gift-toggle">
+    <label for="present-attached" class="gift" title="Present attached?"></label>
+    <input type="checkbox" id="is-quest-letter" class="dialog-toggle" aria-label="Toggle quest scoring">
+    <label for="is-quest-letter" class="dialog" title="Toggle quest scoring">
+      <img src="IMAGE.PNG" alt="quest">
+      <span class="dialog-text"><small>Toggle quest scoring</small></span>
+    </label>
+  </div>
+  <div id="charCounter">Characters: 0 / 192</div>
 
-	<div id="trigger-text">How does this tool work?</div>
+  <br />
 
-	<div id="modal-overlay">
-		<div id="modal">
-			<p class="modal-text">
-				Every letter you send to a resident villager in the original Animal Crossing is internally scored to
-				determine how a villager will respond.
-				The scoring algorithm defaults to a point-based system, but changes to a rank-based system when you send
-				a letter as part of a "quest" (i.e.
-				when a villager specifically requests you to write to them). Type your letter's body text in the input
-				field to see how your letter will be scored by the game! <br /><br />
+  <div id="trigger-text"><img src="IMAGE.PNG" style="margin-right: 2px" alt="QUESTION"
+      class="inline-image"> How does this tool work?</div>
+  <div id="modal-overlay">
+    <div id="modal">
+      <p class="modal-text">
+        Every letter you send to a villager in the original Animal Crossing is internally scored to determine how they
+        will respond.
+        This scoring algorithm defaults to a point-based total, but changes to a rank-based algorithm when you send a
+        letter as part of a "quest" (when a villager requests for you to write them). Type your letter's body text in
+        the input field to see how your letter will be scored by the game! <br /><br />
 
-				Toggle "quest" scoring by checking the QUEST checkbox. <br /><br />
-				Mark whether your letter has a present attached by checking the PRESENT checkbox.<br /><br />
+        Toggle "quest" scoring by clicking the <img src="IMAGE.PNG" alt="QUEST"
+          class="inline-image"> quest toggle in the bottom left. <br /><br />
+        Mark whether your letter has a present attached by clicking the <img src="IMAGE.PNG"
+          alt="PRESENT" class="inline-image"> present icon in the top right.<br /><br />
+      </p>
+      <button id="close-modal">Close</button>
+    </div>
+  </div>
 
-				Expand the "additional information" panel below the input field to learn more about how your selected
-				scoring algorithm works!
-			</p>
-			<button id="close-modal">Close</button>
-		</div>
-	</div>
-	<br />
-	<div id="letterScore">Letter Score: 0 pts</div>
-	<div id="responseSettings">
-		<span id="replyMessage" class="neutral">Villager will not send a reply.</span>
-	</div>
-	<div class="quest-container" style="position: relative;">
-		<div style="position: absolute; top: -30px; right: 0; display: flex; gap: 5px;">
-			<label for="is-quest-letter">QUEST?</label>
-			<input type="checkbox" id="is-quest-letter" name="is-quest-letter" style="margin-right: 10px;">
+  <div>
+    <button class="collapsible">
+      Additional information <span class="arrow">▼</span>
+    </button>
+    <div class="content">
+      <table class="letter-scoring">
+        <tr>
+          <td><b>Check A:</b><br /> <span id="checkABox" class="neutral">0 pts</span></td>
+          <td><b>Check B:</b><br /> <span id="checkBBox" class="neutral">0 pts</span></td>
+          <td><b>Check C:</b><br /> <span id="checkCBox" class="neutral">0 pts</span></td>
+          <td><b>Check D:</b><br /> <span id="checkDBox" class="neutral">0 pts</span></td>
+          <td><b>Check E:</b><br /> <span id="checkEBox" class="neutral">0 pts</span></td>
+          <td><b>Check F:</b><br /> <span id="checkFBox" class="neutral">0 pts</span></td>
+          <td><b>Check G:</b><br /> <span id="checkGBox" class="neutral">0 pts</span></td>
+        </tr>
+      </table>
+      <br>
+      <p>
+        <b>Letter Scoring:</b> <br />
+        Sending an unprompted letter to any resident villager will cause the letter's body to be scored through seven
+        different checks. This letter scoring
+        affects the villager's response letter, as well as your friendship with them and your odds at receiving a
+        present in return!
 
-			<label for="present-attached">PRESENT?</label>
-			<input type="checkbox" id="present-attached" name="present-attached">
-		</div>
-	</div>
-	<textarea id="textInput" maxlength="192" rows="5" ; style="width: 100%;"
-		placeholder="Type your letter body here..."></textarea>
-	<div id="charCounter">Characters: 0 / 192</div>
+        <br /><br />
 
-	<br />
+        <b>Possible Outcomes:</b>
+      <table class="letter-scoring">
+        <tr>
+          <td><b>Letter Score</b></td>
+          <td><b>Villager Response</b></td>
+          <td><b>Friendship Change</b></td>
+        </tr>
+        <tr>
+          <td>100 pts or more</td>
+          <td>Positive reply <br /> 50% chance at receiving a random furniture / clothing item</td>
+          <td>+3 if no present attached <br /> +6 if present attached</td>
+        </tr>
+        <tr>
+          <td>50-99 pts</td>
+          <td>No reply</td>
+          <td>+3 if no present attached <br /> +6 if present attached</td>
+        </tr>
+        <tr>
+          <td>Less than 50 pts</td>
+          <td>Negative reply</td>
+          <td>-2 if no present attached <br /> +1 if present attached</td>
+        </tr>
+      </table>
 
-	<table class="ranking-calculation">
-		<tr>
-			<td><b>Length Check:</b><br /> <span id="lengthBox" class="neutral">0 pts</span></td>
-			<td><b>Trigram / Run-on Check:</b><br /> <span id="trigramBox" class="neutral">0 pts</span></td>
-			<td><b>Present Check:</b><br /> <span id="presentBox" class="neutral">0 pts</span></td>
-		</tr>
-	</table>
+      <br />
 
-	<table class="letter-scoring">
-		<tr>
-			<td><b>Check A:</b><br /> <span id="checkABox" class="neutral">0 pts</span></td>
-			<td><b>Check B:</b><br /> <span id="checkBBox" class="neutral">0 pts</span></td>
-			<td><b>Check C:</b><br /> <span id="checkCBox" class="neutral">0 pts</span></td>
-			<td><b>Check D:</b><br /> <span id="checkDBox" class="neutral">0 pts</span></td>
-			<td><b>Check E:</b><br /> <span id="checkEBox" class="neutral">0 pts</span></td>
-			<td><b>Check F:</b><br /> <span id="checkFBox" class="neutral">0 pts</span></td>
-			<td><b>Check G:</b><br /> <span id="checkGBox" class="neutral">0 pts</span></td>
-		</tr>
-	</table>
+      <b>Check A: Punctuation</b><br />
+      <small>
+        Adds +20 pts if the letter ends with punctuation, so long as the letter body does not take up all 192
+        characters.
+        Also checks the next three characters following every occurrence of a punctuation mark. If there is a capital
+        letter within those three characters, adds +10 pts per occurrence. If there isn't AND there is any other
+        non-space character present,
+        -10 pts per occurrence.
+      </small>
 
-	<br />
+      <br /> <br />
 
-	<div>
-		<button class="collapsible">
-			Additional information <span class="arrow">▼</span>
-		</button>
-		<div class="content">
-			<p>
-				<b>Letter Scoring:</b> <br />
-				Sending an unprompted letter to any resident villager will cause the letter's body to be scored through
-				seven different checks. This letter scoring
-				affects the villager's response letter, as well as your friendship with them and your odds at receiving
-				a present in return!
+      <b>Check B: Trigrams</b><br />
+      <small>
+        Adds +3 pts per valid trigram found within the starting three characters of each word. A trigram is considered
+        valid
+        if it is found within the game's internal trigram tables.
+        <b>
+          <i>
+            Note that these tables are bugged in the North American / Australian versions of the game,
+            resulting in each trigram table being much longer than intended.
+          </i>
+        </b>
+        This tool takes into account this bug and scores the letter as the game would. More information about this bug
+        can be found <a href="{{ site.baseurl }}/posts/ac-trigrams/">here</a>.
+      </small>
 
-				<br /><br />
+      <br /> <br />
 
-				<b>Possible Outcomes:</b>
-			<table class="letter-scoring">
-				<tr>
-					<td><b>Letter Score</b></td>
-					<td><b>Villager Response</b></td>
-					<td><b>Friendship Change</b></td>
-				</tr>
-				<tr>
-					<td>100 pts or more</td>
-					<td>Positive reply <br /> 50% chance at receiving a random furniture / clothing item</td>
-					<td>+3 if no present attached <br /> +6 if present attached</td>
-				</tr>
-				<tr>
-					<td>50-99 pts</td>
-					<td>No reply</td>
-					<td>+3 if no present attached <br /> +6 if present attached</td>
-				</tr>
-				<tr>
-					<td>Less than 50 pts</td>
-					<td>Negative reply</td>
-					<td>-2 if no present attached <br /> +1 if present attached</td>
-				</tr>
-			</table>
+      <b>Check C: Leading Capital</b><br />
+      <small>
+        Adds +20 pts if the first non-space character in the letter is a capital alphabetic letter; -10 pts if not.
+      </small>
 
-			<br />
+      <br /> <br />
 
-			<b>Check A: Punctuation</b><br />
-			<small>
-				Adds +20 pts if the letter ends with punctuation, so long as the letter body does not take up all 192
-				characters.
-				Also checks the next three characters following every occurrence of a punctuation mark. If there is a
-				capital
-				letter within those three characters, adds +10 pts per occurrence. If there isn't AND there is any other
-				non-space character present,
-				-10 pts per occurrence.
-			</small>
+      <b>Check D: Repeating Characters</b><br />
+      <small>
+        -50 pts if any letter of the alphabet is repeated sequentially three times or more.
+      </small>
 
-			<br /> <br />
+      <br /> <br />
 
-			<b>Check B: Trigrams</b><br />
-			<small>
-				Adds +3 pts per valid trigram found within the starting three characters of each word. A trigram is
-				considered valid
-				if it is found within the game's internal trigram tables.
-				<b>
-					<i>
-						Note that these tables are bugged in the North American / Australian versions of the game,
-						resulting in each trigram table being much longer than intended.
-					</i>
-				</b>
-				This tool takes into account this bug and scores the letter as the game would.
-			</small>
+      <b>Check E: Space Ratio</b><br />
+      <small>
+        If the ratio of spaces to non-space characters in the letter is greater than or equal to 20%, add +20 pts. If
+        the letter empty, all spaces, or is less than 20% spaces, then -20pts.
+      </small>
 
-			<br /> <br />
+      <br /> <br />
 
-			<b>Check C: Leading Capital</b><br />
-			<small>
-				Adds +20 pts if the first non-space character in the letter is a capital alphabetic letter; -10 pts if
-				not.
-			</small>
+      <b>Check F: Run-on Sentence</b><br />
+      <small>
+        If the letter has at least one punctuation mark before the final 75 characters of the letter, check after each
+        punctuation mark for an instance of 75 sequential characters without any punctuation. If there are 75 sequential
+        characters without punctuation, then -150 pts.
+      </small>
 
-			<br /> <br />
+      <br /> <br />
 
-			<b>Check D: Repeating Characters</b><br />
-			<small>
-				-50 pts if any letter of the alphabet is repeated sequentially three times or more.
-			</small>
+      <b>Check G: 32-Character Space Groupings</b><br />
+      <small>
+        Checks every 32 sequential characters in the letter for at least one space. -20 pts per group of 32 characters
+        that does not have a space.
+        This check does not occur if a grouping is not at least 32 characters long. For example, a letter 63 characters
+        long will only check the first
+        grouping of 32 characters and will not care about the remaining 31 characters.
+      </small>
+      </p>
+    </div>
+    <div class="quest-content">
+      <table class="ranking-calculation">
+        <tr>
+          <td><b>Length Check:</b><br /> <span id="lengthBox" class="neutral">0 pts</span></td>
+          <td><b>Trigram / Run-on Check:</b><br /> <span id="trigramBox" class="neutral">0 pts</span></td>
+          <td><b>Present Check:</b><br /> <span id="presentBox" class="neutral">0 pts</span></td>
+        </tr>
+      </table>
+      <br>
+      <p>
+        <b>Quest Letters:</b> <br />
+        Whenever you ask a villager if they need anything, there's a chance they will tell you that you should write a
+        letter to them! This triggers the
+        start of a questline where, if you mail a letter to a villager who has this quest active, a different ranking
+        system is used instead of the normal scoring algorithm.
+        This specific quest letter can rank between 0 and 11, with guaranteed rewards depending on your letter's rank.
+        After mailing this letter, you can then talk to the villager again and your mailbox will update with a letter
+        from them.
+        If your letter ranked 3 or higher, this response letter will always have an attached present, which differs
+        depending on the rank. The attached presents are
+        consistent every time, meaning you can guarantee specific rewards if you pre-calculate your letter's rank! These
+        rewards, and information about the quest-specific checks, are
+        detailed below. <br /><br />
 
-			<br /> <br />
+        <b>Quest Rewards:</b>
+      <table class="letter-scoring">
+        <tr>
+          <td><b>Letter Rank</b></td>
+          <td><b>Response Letter's Attached Present</b></td>
+        </tr>
+        <tr>
+          <td>0 - 2</td>
+          <td>No attached gift</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Random clothing item</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Random furniture item</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Random carpet or wallpaper (50% chance each)</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Your town's native fruit</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Random clothing item</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Rare clothing item</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Random, non-native fruit</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Rare furniture item</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Rare carpet or rare wallpaper (50% chance each)</td>
+        </tr>
+      </table>
 
-			<b>Check E: Space Ratio</b><br />
-			<small>
-				If the ratio of spaces to non-space characters in the letter is greater than or equal to 20%, add +20
-				pts. If the letter empty, all spaces, or is less than 20% spaces, then -20pts.
-			</small>
+      <br />
+      <br />
 
-			<br /> <br />
+      <b>Length Check:</b> <br />
+      <small>
+        Quest letters have a length check that simply counts the total number of non-space characters in the letter. If
+        there are 49 or more non-space characters, your letter
+        gets +2 rank. If there are between 17 and 48 non-space characters, your letter gets +1 rank. Otherwise, you get
+        no rank added.
+      </small>
 
-			<b>Check F: Run-on Sentence</b><br />
-			<small>
-				If the letter has at least one punctuation mark before the final 75 characters of the letter, check
-				after each punctuation mark for an instance of 75 sequential characters without any punctuation. If
-				there are 75 sequential characters without punctuation, then -150 pts.
-			</small>
+      <br /><br />
 
-			<br /> <br />
+      <b>Trigram / Run-on Check:</b> <br />
+      <small>
+        This check calculates the total percentage of valid trigrams in your letter, as well as a special "run-on" check
+        for repeated characters. A trigram is defined
+        as the leading three characters of each word, and the game has an internal list of "valid" ones. This trigram
+        check uses the same tables as the normal letter scoring,
+        meaning this check is bugged in the North American / Australian versions of the game. More information on
+        trigrams and this bug can be found <a href="{{ site.baseurl }}/posts/ac-trigrams/">here</a>.<br /><br />
+        The game calculates valid trigrams by getting the total number of words in the the letter and comparing it to
+        the total number of valid trigrams.
+        The actual calculation is:
 
-			<b>Check G: 32-Character Space Groupings</b><br />
-			<small>
-				Checks every 32 sequential characters in the letter for at least one space. -20 pts per group of 32
-				characters that does not have a space.
-				This check does not occur if a grouping is not at least 32 characters long. For example, a letter 63
-				characters long will only check the first
-				grouping of 32 characters and will not care about the remaining 31 characters.
-			</small>
-			</p>
-		</div>
-		<div class="quest-content">
-			<p>
-				<b>Quest Letters:</b> <br />
-				Whenever you ask a villager if they need anything, there's a chance they will tell you that you should
-				write a letter to them! This triggers the
-				start of a questline where, if you mail a letter to a villager who has this quest active, a different
-				ranking system is used instead of the normal scoring algorithm.
-				This specific quest letter can rank between 0 and 11, with guaranteed rewards depending on your letter's
-				rank.
-				After mailing this letter, you can then talk to the villager again and your mailbox will update with a
-				letter from them.
-				If your letter ranked 3 or higher, this response letter will always have an attached present, which
-				differs depending on the rank. The attached presents are
-				consistent every time, meaning you can guarantee specific rewards if you pre-calculate your letter's
-				rank! These rewards, and information about the quest-specific checks, are
-				detailed below. <br /><br />
+        <code>    (VALID_TRIGRAMS * 10000) / (TOTAL_WORDS * 100) </code> <br /><br />
 
-				<b>Quest Rewards:</b>
-			<table class="letter-scoring">
-				<tr>
-					<td><b>Letter Rank</b></td>
-					<td><b>Response Letter's Attached Present</b></td>
-				</tr>
-				<tr>
-					<td>0 - 2</td>
-					<td>No attached gift</td>
-				</tr>
-				<tr>
-					<td>3</td>
-					<td>Random clothing item</td>
-				</tr>
-				<tr>
-					<td>4</td>
-					<td>Random furniture item</td>
-				</tr>
-				<tr>
-					<td>5</td>
-					<td>Random carpet or wallpaper (50% chance each)</td>
-				</tr>
-				<tr>
-					<td>6</td>
-					<td>Your town's native fruit</td>
-				</tr>
-				<tr>
-					<td>7</td>
-					<td>Random clothing item</td>
-				</tr>
-				<tr>
-					<td>8</td>
-					<td>Rare clothing item</td>
-				</tr>
-				<tr>
-					<td>9</td>
-					<td>Random, non-native fruit</td>
-				</tr>
-				<tr>
-					<td>10</td>
-					<td>Rare furniture item</td>
-				</tr>
-				<tr>
-					<td>11</td>
-					<td>Rare carpet or rare wallpaper (50% chance each)</td>
-				</tr>
-			</table>
+        Further, a letter is considered a "run-on" if any letter of the alphabet is sequentially repeated three times or
+        more. The exceptions to this rule are
+        these characters, which can be repeated sequentially up to seven times:
 
-			<br />
-			<br />
+        <code>    ! " _ - 💢 % @ · </code> <br /><br />
 
-			<b>Length Check:</b> <br />
-			<small>
-				Quest letters have a length check that simply counts the total number of non-space characters in the
-				letter. If there are 49 or more non-space characters, your letter
-				gets +2 rank. If there are between 17 and 48 non-space characters, your letter gets +1 rank. Otherwise,
-				you get no rank added.
-			</small>
-
-			<br /><br />
-
-			<b>Trigram / Run-on Check:</b> <br />
-			<small>
-				This check calculates the total percentage of valid trigrams in your letter, as well as a special
-				"run-on" check for repeated characters. A trigram is defined
-				as the leading three characters of each word, and the game has an internal list of "valid" ones. This
-				trigram check uses the same tables as the normal letter scoring,
-				meaning this check is bugged in the North American / Australian versions of the game.
-				The game calculates valid trigrams by getting the total number of words in the the letter and comparing
-				it to the total number of valid trigrams.
-				The actual calculation is:
-
-				<code>    (VALID_TRIGRAMS * 10000) / (TOTAL_WORDS * 100) </code> <br /><br />
-
-				Further, a letter is considered a "run-on" if any letter of the alphabet is sequentially repeated three
-				times or more. The exceptions to this rule are
-				these characters, which can be repeated sequentially up to seven times:
-
-				<code>    ! " _ - 💢 % @ · </code> <br /><br />
-
-				After this, the check calculates the rank, which is best summarized via psuedocode:
-				<pre>
+        After this, the check calculates the rank, which is best summarized via psuedocode:
+        <pre>
           <code>
               RANK = 3
 
@@ -314,21 +326,166 @@
             </code>
           </pre>
 
-				If you think this is programmed strangely, you are correct! Since this check defaults the rank to 3, you
-				can purposefully write a letter
-				to avoid the RANK = 0 conditions to still get +3 rank. An example of the easiest letter to write that
-				gives +3 here is just "!!!!!"
-			</small>
+        If you think this is programmed strangely, you are correct! Since this check defaults the rank to 3, you can
+        purposefully write a letter
+        to avoid the RANK = 0 conditions to still get +3 rank. An example of the easiest letter to write that gives +3
+        here is just "!!!!!"
+      </small>
 
-			<br /><br />
+      <br /><br />
 
-			<b>Present Check:</b> <br />
-			<small>
-				Simply adds +6 rank if you include a present in your letter.
-			</small>
-			</p>
-		</div>
-	</div>
+      <b>Present Check:</b> <br />
+      <small>
+        Simply adds +6 rank if you include a present in your letter.
+      </small>
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top: 35px">
+    <small>
+      Source code for this project can be found <a href="https://github.com/HunterRDev/AC-Letter-Scorer">here</a>.
+      <br />
+      Tool created based off datamining and decompilation done by Cuyler, James Chambers, and myself.
+    </small>
+  </div>
 </body>
+
+<!-- HANDLING FOR STATIONERY IMAGE -->
+<script>
+  const LEFT = 0.115;
+  const RIGHT = 0.105;
+  const TOP_FIRST_BASELINE = 0.239;
+  const STEP = 0.0878;
+  const FONT_TO_HEIGHT = 0.06;
+  const MAX_LINES = 6;
+
+  function layout(paper, box) {
+    const r = paper.getBoundingClientRect();
+    const w = r.width, h = r.height;
+    if (!w || !h) return;
+
+    const leftPx = Math.round(LEFT * w);
+    const widthPx = Math.round((1 - LEFT - RIGHT) * w);
+    const stepPx = STEP * h;
+    const topPx = Math.round(TOP_FIRST_BASELINE * h);
+
+    box.style.left = leftPx + 'px';
+    box.style.top = topPx + 'px';
+    box.style.width = widthPx + 'px';
+    box.style.lineHeight = stepPx + 'px';
+    box.style.fontSize = (FONT_TO_HEIGHT * h) + 'px';
+    box.style.height = (stepPx * MAX_LINES) + 'px';
+  }
+
+  function makeMirror(box) {
+    const mirror = document.createElement('div');
+    mirror.style.position = 'absolute';
+    mirror.style.visibility = 'hidden';
+    mirror.style.pointerEvents = 'none';
+    mirror.style.whiteSpace = 'pre-wrap';
+    mirror.style.wordBreak = 'break-word';
+    mirror.style.overflowWrap = 'anywhere';
+    mirror.style.boxSizing = 'content-box';
+    mirror.style.padding = '0';
+    document.body.appendChild(mirror);
+
+    const sync = () => {
+      const cs = getComputedStyle(box);
+      mirror.style.font = cs.font;
+      mirror.style.lineHeight = cs.lineHeight;
+      mirror.style.letterSpacing = cs.letterSpacing;
+      mirror.style.textTransform = cs.textTransform;
+      mirror.style.width = box.clientWidth + 'px';
+    };
+
+    const countLinesFor = (text) => {
+      sync();
+      let t = text.length ? text : ' ';
+      const trail = t.match(/\n+$/);
+      if (trail) t += '\u00A0'.repeat(trail[0].length);
+      mirror.textContent = t;
+      const lh = parseFloat(getComputedStyle(box).lineHeight) || 1;
+      return Math.round(mirror.offsetHeight / lh);
+    };
+
+    const countLines = () => countLinesFor(box.value);
+    const destroy = () => mirror.remove();
+    return { countLines, countLinesFor, sync, destroy };
+  }
+
+  let lastValue = '', lastSelStart = 0, lastSelEnd = 0;
+  function snapshot(box) {
+    lastValue = box.value;
+    lastSelStart = box.selectionStart;
+    lastSelEnd = box.selectionEnd;
+  }
+  function restore(box) {
+    box.value = lastValue;
+    try { box.setSelectionRange(lastSelStart, lastSelEnd); } catch { }
+  }
+
+  function init() {
+    const paper = document.querySelector('.stationery');
+    const LETTER_BOX = document.getElementById('letter-text');
+    if (!paper || !LETTER_BOX) {
+      console.error('missing image');
+      return;
+    }
+
+    LETTER_BOX.style.position = 'absolute';
+    LETTER_BOX.style.padding = '0';
+
+    layout(paper, LETTER_BOX);
+    const mirror = makeMirror(LETTER_BOX);
+    const ro = new ResizeObserver(() => {
+      layout(paper, LETTER_BOX);
+      mirror.sync();
+    });
+    ro.observe(paper);
+
+    LETTER_BOX.addEventListener('beforeinput', (e) => {
+      snapshot(LETTER_BOX);
+
+      const { value, selectionStart, selectionEnd } = LETTER_BOX;
+      let next = null;
+
+      if (e.inputType === 'insertLineBreak') {
+        next = value.slice(0, selectionStart) + '\n' + value.slice(selectionEnd);
+      } else if (e.inputType === 'insertText' && typeof e.data === 'string') {
+        next = value.slice(0, selectionStart) + e.data + value.slice(selectionEnd);
+      } else if (e.inputType && e.inputType.startsWith('insertFrom')) {
+        return;
+      } else {
+        return;
+      }
+
+      if (mirror.countLinesFor(next) > MAX_LINES) {
+        e.preventDefault();
+      }
+    });
+
+    LETTER_BOX.addEventListener('keydown', (e) => {
+      if (e.key !== 'Undo' && e.key !== 'Redo') snapshot(LETTER_BOX);
+
+      if (e.key === 'Enter') {
+        const { value, selectionStart, selectionEnd } = LETTER_BOX;
+        const next = value.slice(0, selectionStart) + '\n' + value.slice(selectionEnd);
+        if (mirror.countLinesFor(next) > MAX_LINES) e.preventDefault();
+      }
+    });
+
+    LETTER_BOX.addEventListener('input', () => {
+      if (mirror.countLinesFor(LETTER_BOX.value) > MAX_LINES) {
+        restore(LETTER_BOX);
+      }
+    });
+
+    window.addEventListener('beforeunload', mirror.destroy);
+  }
+
+  init();
+
+</script>
 
 </html>

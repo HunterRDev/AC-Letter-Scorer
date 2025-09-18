@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 	const MAX_CHARS = 192;
-	const LETTER_BOX = document.getElementById('textInput');
+	const LETTER_BOX = document.getElementById('letter-text');
 	const CHAR_COUNTER_BOX = document.getElementById('charCounter');
 	const SCORE_BOX = document.getElementById('letterScore');
 	const CHECK_A_BOX = document.getElementById('checkABox');
@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	const CHECK_G_BOX = document.getElementById('checkGBox');
 	const TRIGRAM_BOX = document.getElementById('trigramBox');
 	const LENGTH_BOX = document.getElementById('lengthBox');
+	const HEADER_TABLE = document.getElementById('header-table');
 	const MODAL_TRIGGER_TEXT = document.getElementById('trigger-text');
 	const MODAL_BODY = document.getElementById('modal-overlay');
 	const CLOSE_MODAL = document.getElementById('close-modal');
@@ -25,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		let score = 0;
 
-		// +20pts if letter ends with punctuation, so long as letter is not 192 characters long
 		if (TRIMMED_INPUT.length < MAX_CHARS && /[.?!]$/.test(TRIMMED_INPUT)) {
 			score += 20;
 		}
@@ -33,32 +33,28 @@ document.addEventListener("DOMContentLoaded", function () {
 		let currentIndex = 0;
 
 		while (currentIndex < PADDED_INPUT.length) {
-		  const match = PADDED_INPUT.slice(currentIndex).match(/[.?!]/);
-	
-		  if (!match) {
-			break; // exit loop if no punctuation mark is found
-		  }
-	
-		  const PUNCT_INDEX = currentIndex + match.index;
-		  const NEXT_THREE_CHARS = PADDED_INPUT.slice(PUNCT_INDEX + 1, PUNCT_INDEX + 4);
-	
-		  if (/^\s{3}$/.test(NEXT_THREE_CHARS)) {
-			currentIndex = PUNCT_INDEX + 4; // skip and move to the next check if 3 spaces
-			continue;
-		  }
-	
-		  // find the first capital letter in the next three characters
-		  const CAPITAL_MATCH = NEXT_THREE_CHARS.match(/[A-Z]/);
-	
-		  if (CAPITAL_MATCH) {
-			score += 10;
-			// update currentIndex to where the capital letter was found + 1
-			currentIndex = PUNCT_INDEX + 1 + CAPITAL_MATCH.index + 1;
-		  } else {
-			score -= 10;
-			// if no capital letter, proceed to the next three characters
-			currentIndex = PUNCT_INDEX + 4;
-		  }
+			const match = PADDED_INPUT.slice(currentIndex).match(/[.?!]/);
+
+			if (!match) {
+				break;
+			}
+
+			const PUNCT_INDEX = currentIndex + match.index;
+			const NEXT_THREE_CHARS = PADDED_INPUT.slice(PUNCT_INDEX + 1, PUNCT_INDEX + 4);
+
+			if (/^\s{3}$/.test(NEXT_THREE_CHARS)) {
+				currentIndex = PUNCT_INDEX + 4; // skip and move to the next check if 3 spaces
+				continue;
+			}
+			const CAPITAL_MATCH = NEXT_THREE_CHARS.match(/[A-Z]/);
+
+			if (CAPITAL_MATCH) {
+				score += 10;
+				currentIndex = PUNCT_INDEX + 1 + CAPITAL_MATCH.index + 1;
+			} else {
+				score -= 10;
+				currentIndex = PUNCT_INDEX + 4;
+			}
 		}
 
 		return score;
@@ -72,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		let allTrigrams = await getAllTrigrams(PADDED_INPUT);
 
 		// in-game trigram tables replicated via txt file
-		const response = await fetch('Resources/trigrams-bugged.txt');
+		const response = await fetch('../assets/letter-scorer/trigrams-bugged.txt');
 		if (!response.ok) {
 			console.error("Error fetching trigrams file:", response.statusText);
 			return 0;
@@ -106,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 		}
-		// +3 pts per matching trigram
+
 		score = counter * 3;
 		return score;
 	}
@@ -116,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		const FIRST_CHAR = LETTER_BOX.value[0];
 		let score = 0;
 
-		// +20 pts if first letter is capital, -10 if not
 		if (FIRST_CHAR) {
 			if (/[A-Z]/.test(FIRST_CHAR)) {
 				score += 20;
@@ -151,7 +146,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		let score = 0;
 
-		// +20 pts if num spaces > 20%
 		if (SPACE_RATIO >= 20) {
 			score += 20;
 		} else {
@@ -172,12 +166,10 @@ document.addEventListener("DOMContentLoaded", function () {
 		for (const PUNCTUATION of MATCHED_PUNCTUATION) {
 			const PUNCTUATION_INDEX = PUNCTUATION.index;
 
-			// check if there are at least 75 characters after the punctuation
 			if (TRIMMED_INPUT.length - PUNCTUATION_INDEX > 75) {
-				// check the next 75 characters for a long sequence without punctuation
 				const GROUPING = input.substring(PUNCTUATION_INDEX + 1, PUNCTUATION_INDEX + 76);
 				const PUNCUTATION_MISSING = /[^.?!]{75}/;
-				// -150pts if no punctuation
+
 				if (PUNCUTATION_MISSING.test(GROUPING)) {
 					score -= 150;
 				}
@@ -191,15 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
 	async function checkG(input) {
 		const TRIMMED_INPUT = input.replace(/^[ \t]+|[ \t]+$/g, '');
 		const TOTAL_LENGTH = TRIMMED_INPUT.length;
-		// find 32-char groupings
 		const NUM_32_GROUPINGS = Math.floor(TOTAL_LENGTH / 32);
 
 		let score = 0;
 
-		// check each grouping for at least one space
 		for (let i = 0; i < NUM_32_GROUPINGS; i++) {
 			const GROUP = TRIMMED_INPUT.slice(i * 32, (i + 1) * 32);
-			// -20 pts per group with no space
 			if (!/ /.test(GROUP)) {
 				score -= 20;
 			}
@@ -321,19 +310,27 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 
 		if (score >= 100) {
-			replyMessage.innerHTML = `<b>Villager will send a favorable reply!</b> <br> 50% chance of receiving a random clothing/furniture item! <br> +${friendship} friendship with villager`;
+			replyMessage.innerHTML = `<b>Villager will send a favorable reply!</b> <br> <small>50% chance of receiving a random clothing/furniture item!</small>`;
 			replyMessage.className = "positive";
+			friendshipMessage.innerHTML = `<b>+${friendship}</b>`;
+			friendshipMessage.className = "positive";
 		} else if (score < 50) {
 			if (PRESENT_ATTACHED) {
-				replyMessage.innerHTML = `<b>Villager will send a negative reply...</b> <br> <span style="color: green"> +1 friendship with villager</span>`;
+				replyMessage.innerHTML = `<b>Villager will send a negative reply...</b>`;
+				friendshipMessage.innerHTML = `<b>+1</b>`;
+				friendshipMessage.className = "positive";
 			}
 			else {
-				replyMessage.innerHTML = `<b>Villager will send a negative reply...</b> <br> -2 friendship with villager`;
+				replyMessage.innerHTML = `<b>Villager will send a negative reply...</b>`;
+				friendshipMessage.innerHTML = `<b>-2</b>`;
+				friendshipMessage.className = "negative";
 			}
 			replyMessage.className = "negative";
 		} else {
-			replyMessage.innerHTML = `<b>Villager will not send a reply...</b> <br> <span style="color: green"> +${friendship} friendship with villager</span>`;
+			replyMessage.innerHTML = `<b>Villager will not send a reply...</b>`;
 			replyMessage.className = "neutral";
+			friendshipMessage.innerHTML = `<b>+${friendship}</b>`;
+			friendshipMessage.className = "positive";
 		}
 	}
 
@@ -361,7 +358,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const LETTER_RANK = TRIGRAM_RANK + LENGTH_RANK + presentRank;
 
 		if (IS_QUEST_LETTER) {
-			SCORE_BOX.textContent = `Letter Rank: ${LETTER_RANK}`;
+			SCORE_BOX.textContent = `${LETTER_RANK}`;
+			scoreHeader.innerHTML = `<b>LETTER RANK</b>`;
 
 			let presentText = "";
 			switch (LETTER_RANK) {
@@ -393,25 +391,54 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			if (LETTER_RANK >= 3) {
-				replyMessage.innerHTML = `Villager response letter will include <br /> <b>${presentText}</b> !`;
+				replyMessage.innerHTML = `Villager response letter will include <br> <b>${presentText}</b> !`;
 				replyMessage.className = "positive";
 			}
 			else {
-				replyMessage.innerHTML = `Villager response letter will not include a present... <br /><br />`;
+				replyMessage.innerHTML = `Villager response letter will not include a present...`;
 				replyMessage.className = "neutral";
 			}
 			// --- end quest letter ranking --
 		} else {
-			SCORE_BOX.textContent = `Letter Score: ${LETTER_SCORE} pts`;
+			SCORE_BOX.textContent = `${LETTER_SCORE} pts`;
+			scoreHeader.innerHTML = `<b>LETTER SCORE</b>`;
 			updateReplyMessage(LETTER_SCORE);
 		}
 		CHAR_COUNTER_BOX.textContent = `Characters: ${CHAR_COUNT} / ${MAX_CHARS}`;
 	}
 
+
 	// --- HTML interfacing ---
+
+
+	LETTER_BOX.addEventListener("keydown", (e) => {
+		let lines = LETTER_BOX.value.split(/\r\n|\r|\n/);
+
+		// remove trailing empty lines
+		while (lines.length && lines[lines.length - 1] === "") {
+			lines.pop();
+		}
+
+		// block pressing Enter if already at 6 non-empty lines
+		if (e.key === "Enter" && lines.length >= 6) {
+			e.preventDefault();
+		}
+	});
+
+	LETTER_BOX.addEventListener("input", () => {
+		let lines = LETTER_BOX.value.split(/\r\n|\r|\n/);
+
+		// trim down if pasted text goes beyond 6 lines
+		if (lines.length > 6) {
+			lines = lines.slice(0, 6);
+			LETTER_BOX.value = lines.join("\n");
+		}
+	});
+
 	LETTER_BOX.addEventListener('input', async function () {
 		updateBoxDetails();
 	});
+
 	MODAL_TRIGGER_TEXT.addEventListener('click', () => {
 		MODAL_BODY.style.display = 'flex';
 	});
@@ -461,6 +488,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const QUEST_CONTENT_BOX = document.querySelector('.quest-content');
 		const LETTER_SCORING_BOXES = document.querySelector('.letter-scoring');
 		const LETTER_RANKING_BOXES = document.querySelector('.ranking-calculation');
+
+		HEADER_TABLE.classList.toggle('hide-last-col', IS_QUEST_CHECKED);
 
 		if (IS_QUEST_CHECKED) {
 			if (CONTENT_BOX.style.display == 'block') {

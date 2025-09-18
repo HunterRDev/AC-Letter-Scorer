@@ -1,6 +1,90 @@
-#charCounter, #letterScore {
+@font-face {
+	font-family: 'LetterFont';
+	src: url('FONT_HERE.woff2') format('woff2'),
+		url('FONT_HERE.woff') format('woff');
+	font-weight: bold;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Pixel';
+	src: url('FONT_HERE.woff2') format('woff2'),
+		url('FONT_HERE.woff') format('woff');
+	font-style: normal;
+}
+
+#charCounter,
+#letterScore {
 	font-size: 14px;
 	color: #555;
+}
+
+:root {
+	--gap-x: 3em;
+	--gap-y: 0px;
+	--divider: #d0d5dd;
+	--divider-w: 1px;
+}
+
+#header-table {
+	border-collapse: separate !important;
+	border-spacing: 0 var(--gap-y) !important;
+	table-layout: auto !important;
+	width: auto !important;
+	max-width: 100%;
+}
+
+#header-table th {
+	font-family: 'Pixel';
+}
+
+#header-table td {
+	position: relative;
+	padding: 2px 4px;
+	border: 0;
+}
+
+#header-table tbody>tr:nth-child(2)> :first-child {
+	text-align: center;
+	vertical-align: middle;
+}
+
+#header-table.hide-last-col tr>*:last-child {
+	display: none !important;
+}
+
+#header-table tr>*+* {
+	padding-left: calc(var(--gap-x));
+}
+
+#header-table tr>*+*::before {
+	content: "";
+	position: absolute;
+	top: calc(-1 * var(--gap-y));
+	bottom: calc(-1 * var(--gap-y));
+	left: calc(var(--gap-x) / 2 - var(--divider-w) / 2);
+	width: var(--divider-w);
+	background: var(--divider);
+	pointer-events: none;
+}
+
+#header-table td.fit-one-line {
+	container-type: inline-size;
+	white-space: nowrap;
+	overflow-wrap: normal !important;
+	word-break: keep-all;
+}
+
+#header-table td.fit-one-line>.fit {
+	display: block;
+	font-size: clamp(10px, 3cqw, 16px);
+	line-height: 1.1;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--divider: #40454e;
+	}
 }
 
 #modal-overlay {
@@ -16,30 +100,30 @@
 	z-index: 1000;
 }
 
-	#modal-overlay.show {
-		pointer-events: auto;
-	}
+#modal-overlay.show {
+	pointer-events: auto;
+}
 
 #modal {
 	background: #1b1b1e;
 	border-radius: 8px;
-	width: 90%;
-	max-width: 400px;
+	width: 95%;
+	max-width: 600px;
 	padding: 20px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	position: relative;
 }
 
-	#modal h2 {
-		margin: 0 0 10px;
-		font-size: 1.5em;
-		text-align: center;
-	}
+#modal h2 {
+	margin: 0 0 10px;
+	font-size: 1.5em;
+	text-align: center;
+}
 
-	#modal p {
-		text-align: left;
-		margin: 10px 0;
-	}
+#modal p {
+	text-align: left;
+	margin: 10px 0;
+}
 
 #close-modal {
 	display: block;
@@ -51,6 +135,7 @@
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+	font-family: 'Pixel';
 }
 
 body.modal-open {
@@ -60,10 +145,15 @@ body.modal-open {
 	align-items: center;
 }
 
-	body.modal-open #modal-overlay {
-		pointer-events: auto;
-	}
+body.modal-open #modal-overlay {
+	pointer-events: auto;
+}
 
+.modal-text {
+	font-size: clamp(10px, 5cqw, 14px);
+	font-family: 'Pixel';
+	font-weight: 100;
+}
 
 #close-modal:hover {
 	background: #aa3333;
@@ -75,18 +165,23 @@ body.modal-open {
 	cursor: pointer;
 }
 
-	#trigger-text:hover {
-		text-decoration: underline;
-	}
+#trigger-text:hover {
+	text-decoration: underline;
+}
 
 #letterScore {
-	font-size: 24px;
+	font-size: clamp(16px, 2.2cqw, 32px);
 	font-weight: bold;
 	color: white;
 }
 
 #replyMessage {
-	font-size: 14px;
+	font-size: clamp(6px, 2.2cqw, 16px);
+	line-height: 0.6;
+}
+
+#friendshipMessage {
+	font-size: clamp(12px, 2.2cqw, 16px);
 	line-height: 0.6;
 }
 
@@ -106,7 +201,8 @@ table {
 	margin-top: 10px;
 }
 
-th, td {
+th,
+td {
 	border: 1px solid #ccc;
 	padding: 10px;
 	text-align: left;
@@ -114,6 +210,150 @@ th, td {
 
 th {
 	background: #f9f9f9;
+}
+
+:root {
+	--pad-top: 10.5%;
+	--pad-left: 10.5%;
+	--line-step: 200%;
+	--max-width: 980px;
+	--font: "Courier New", monospace;
+}
+
+.stationery {
+	width: 100%;
+	aspect-ratio: 995 / 768;
+	background: url("STATIONERY_IMAGE.PNG") center / contain no-repeat;
+	position: relative;
+	margin: 0 auto;
+}
+
+.write {
+	position: absolute;
+	padding: 0;
+	background: transparent;
+	border: none;
+	outline: none;
+	resize: none;
+	overflow: hidden;
+	white-space: pre-wrap;
+	color: #462731;
+	font-family: 'LetterFont', monospace;
+	font-weight: bold;
+}
+
+@media (max-width: 460px) {
+	:root {
+		--font: ui-monospace, "Courier New", monospace;
+	}
+}
+
+:root {
+	--icon-top: -10%;
+	--gift-right: -5%;
+	--icon-size: 22%;
+	--icon-gap: 0%;
+}
+
+.gift-toggle {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	overflow: hidden;
+}
+
+.gift {
+	position: absolute;
+	top: var(--icon-top);
+	right: var(--gift-right);
+	width: var(--icon-size);
+	aspect-ratio: 1;
+	background: url("PRESENT_IMAGE.PNG") center / contain no-repeat;
+	opacity: .5;
+	z-index: 3;
+	cursor: pointer;
+	transition: opacity .15s ease, transform .12s ease, filter .15s ease;
+}
+
+.gift-toggle:checked+.gift {
+	opacity: 1;
+}
+
+:root {
+	--dialog-left: 6%;
+	--dialog-bottom: 6.5%;
+	--dialog-size: 12%;
+	--dialog-gap: 0.5rem;
+	--dialog-fs: clamp(11px, 2vw, 15px);
+}
+
+.dialog-toggle {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	overflow: hidden;
+}
+
+.dialog {
+	position: absolute;
+	left: var(--dialog-left);
+	bottom: var(--dialog-bottom);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--dialog-gap);
+	z-index: 3;
+	cursor: pointer;
+	user-select: none;
+	touch-action: manipulation;
+}
+
+.dialog img {
+	width: var(--dialog-size);
+	aspect-ratio: 1;
+	display: block;
+	opacity: .5;
+	transition: opacity .15s ease, transform .12s ease, filter .15s ease;
+}
+
+.dialog-toggle:checked+.dialog img {
+	opacity: 1;
+}
+
+.dialog .dialog-text {
+	font-size: var(--dialog-fs);
+	font-family: 'Pixel';
+	line-height: 1.1;
+	color: #111827;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, .08);
+}
+
+.dialog-text {
+	opacity: .5;
+	transition: opacity .15s ease;
+}
+
+.dialog-toggle:checked+.dialog .dialog-text {
+	opacity: 1;
+}
+
+.dialog:active {
+	transform: scale(.98);
+}
+
+.gift:active {
+	transform: scale(.97);
 }
 
 .collapsible {
@@ -144,9 +384,9 @@ th {
 	transition: transform 0.3s;
 }
 
-	.arrow.down {
-		transform: rotate(180deg);
-	}
+.arrow.down {
+	transform: rotate(180deg);
+}
 
 .check-box span {
 	font-weight: bold;
@@ -201,9 +441,9 @@ th {
 		padding: 15px;
 	}
 
-		#modal h2 {
-			font-size: 1.2em;
-		}
+	#modal h2 {
+		font-size: 1.2em;
+	}
 
 	#close-modal {
 		padding: 8px 16px;
