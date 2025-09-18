@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	const MODAL_TRIGGER_TEXT = document.getElementById('trigger-text');
 	const MODAL_BODY = document.getElementById('modal-overlay');
 	const CLOSE_MODAL = document.getElementById('close-modal');
+	let FETCHED_TABLE = null;
 
 	updateBoxDetails();
 
@@ -61,20 +62,28 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	// CHECK B - Trigrams
+
+
+	// in-game trigram tables replicated via txt file
+	async function fetchTrigramTable() {
+		if (!FETCHED_TABLE) {
+			let response = await fetch('Resources/trigrams-bugged.txt');
+			if (!response.ok) {
+				console.error("Error fetching trigrams file:", response.statusText);
+				return 0;
+			}
+			FETCHED_TABLE = await response.text();
+		}
+		return FETCHED_TABLE;
+	}
+
 	async function checkB(input) {
 		const PADDED_INPUT = input.padEnd(MAX_CHARS, ' ');
 
 		let score = 0;
 		let allTrigrams = await getAllTrigrams(PADDED_INPUT);
+		let trigramTables = await fetchTrigramTable();
 
-		// in-game trigram tables replicated via txt file
-		const response = await fetch('../assets/letter-scorer/trigrams-bugged.txt');
-		if (!response.ok) {
-			console.error("Error fetching trigrams file:", response.statusText);
-			return 0;
-		}
-
-		let trigramTables = await response.text();
 		if (!trigramTables) {
 			console.error("Trigrams file is empty or invalid.");
 			return 0;
