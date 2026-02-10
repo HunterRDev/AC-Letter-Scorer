@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// CHECK C - Leading Capital
 	async function checkC() {
-		const FIRST_CHAR = LETTER_BOX.value[0];
+		const FIRST_CHAR = LETTER_BOX.value.match(/\S/)?.[0];
 		let score = 0;
 
 		if (FIRST_CHAR) {
