@@ -127,9 +127,8 @@ permalink: /ac-letter-scorer/
         Adds +20 pts if the letter ends with punctuation, so long as the letter body does not take up all 192
         characters.
         Also checks the next three characters following every occurrence of a punctuation mark. If there is a capital
-        letter within those three characters, adds +10 pts per occurrence. If there isn't AND there is any other
-        non-space character present,
-        -10 pts per occurrence.
+        letter within those three characters, adds +10 pts per occurrence. If there isn't, -10 pts per occurrence.
+        There is no penalty applied if your letter ends with trailing spaces following punctuation.
       </small>
 
       <br /> <br />
@@ -145,8 +144,7 @@ permalink: /ac-letter-scorer/
             resulting in each trigram table being much longer than intended.
           </i>
         </b>
-        This tool takes into account this bug and scores the letter as the game would. More information about this bug
-        can be found <a href="{{ site.baseurl }}/posts/ac-trigrams/">here</a>.
+        This tool takes into account this bug and scores the letter as the game would.
       </small>
 
       <br /> <br />
@@ -168,7 +166,7 @@ permalink: /ac-letter-scorer/
       <b>Check E: Space Ratio</b><br />
       <small>
         If the ratio of spaces to non-space characters in the letter is greater than or equal to 20%, add +20 pts. If
-        the letter empty, all spaces, or is less than 20% spaces, then -20pts.
+        the letter is empty, all spaces, or is less than 20% spaces, then -20pts.
       </small>
 
       <br /> <br />

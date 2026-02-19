@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// CHECK A - Punctuation
 	async function checkA(input) {
-		const PADDED_INPUT = input.padEnd(MAX_CHARS, ' ');
 		const TRIMMED_INPUT = input.replace(/^[ \t]+|[ \t]+$/g, '');
 
 		let score = 0;
@@ -33,20 +32,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		let currentIndex = 0;
 
-		while (currentIndex < PADDED_INPUT.length) {
-			const match = PADDED_INPUT.slice(currentIndex).match(/[.?!]/);
+		while (currentIndex < input.length) {
+			const match = input.slice(currentIndex).match(/[.?!]/);
+			if (!match) break;
 
-			if (!match) {
+			const PUNCT_INDEX = currentIndex + match.index;
+
+			if (!/\S/.test(input.slice(PUNCT_INDEX + 1))) {
 				break;
 			}
 
-			const PUNCT_INDEX = currentIndex + match.index;
-			const NEXT_THREE_CHARS = PADDED_INPUT.slice(PUNCT_INDEX + 1, PUNCT_INDEX + 4);
+			if (PUNCT_INDEX + 3 >= input.length) break;
 
-			if (/^\s{3}$/.test(NEXT_THREE_CHARS)) {
-				currentIndex = PUNCT_INDEX + 4; // skip and move to the next check if 3 spaces
-				continue;
-			}
+			const NEXT_THREE_CHARS = input.slice(PUNCT_INDEX + 1, PUNCT_INDEX + 4);
 			const CAPITAL_MATCH = NEXT_THREE_CHARS.match(/[A-Z]/);
 
 			if (CAPITAL_MATCH) {
@@ -147,15 +145,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// CHECK E - Space Ratio
 	async function checkE(input) {
-		const TRIMMED_INPUT = input.replace(/^[ \t]+|[ \t]+$/g, '');
-
-		const NUM_SPACES = (TRIMMED_INPUT.match(/ /g) || []).length;
-		const NUM_NON_SPACES = TRIMMED_INPUT.length - NUM_SPACES;
-		const SPACE_RATIO = (NUM_SPACES * 100) / NUM_NON_SPACES;
+		const NUM_SPACES = (input.match(/ /g) || []).length;
+		const NUM_NON_SPACES = input.length - NUM_SPACES;
 
 		let score = 0;
 
-		if (SPACE_RATIO >= 20) {
+		if (NUM_NON_SPACES > 0 && ((NUM_SPACES * 100) / NUM_NON_SPACES) >= 20) {
 			score += 20;
 		} else {
 			score -= 20;
@@ -166,26 +161,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// CHECK F - Run On Sentence
 	async function checkF(input) {
-		const TRIMMED_INPUT = input.replace(/^[ \t]+|[ \t]+$/g, '');
-		const PUNCTUATION_REGEX = /[.?!]/g;
-		const MATCHED_PUNCTUATION = [...TRIMMED_INPUT.matchAll(PUNCTUATION_REGEX)];
+		let points = 0;
+		let len = input.length;
+		let i = 0;
 
-		let score = 0
+		while ((len - i) > 76) {
+			const ch = input[i];
 
-		for (const PUNCTUATION of MATCHED_PUNCTUATION) {
-			const PUNCTUATION_INDEX = PUNCTUATION.index;
+			if (ch === '.' || ch === '?' || ch === '!') {
+				let sentence_len = 0;
 
-			if (TRIMMED_INPUT.length - PUNCTUATION_INDEX > 75) {
-				const GROUPING = input.substring(PUNCTUATION_INDEX + 1, PUNCTUATION_INDEX + 76);
-				const PUNCUTATION_MISSING = /[^.?!]{75}/;
+				i++;
 
-				if (PUNCUTATION_MISSING.test(GROUPING)) {
-					score -= 150;
+				while (i < len && input[i] !== '.' && input[i] !== '?' && input[i] !== '!') {
+					sentence_len++;
+
+					if (sentence_len >= 75) {
+						break;
+					}
+
+					i++;
+				}
+
+				if (sentence_len >= 75) {
+					points = -150;
+					break;
 				}
 			}
+
+			i++;
 		}
 
-		return score;
+		return points;
 	}
 
 	// CHECK G - 32-Character Space Groupings
